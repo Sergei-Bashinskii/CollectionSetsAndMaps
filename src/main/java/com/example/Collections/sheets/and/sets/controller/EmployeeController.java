@@ -2,6 +2,7 @@ package com.example.Collections.sheets.and.sets.controller;
 
 import com.example.Collections.sheets.and.sets.exception.EmployeeAlreadyAddedException;
 import com.example.Collections.sheets.and.sets.exception.EmployeeNotFoundException;
+import com.example.Collections.sheets.and.sets.exception.IllegalArgumentException;
 import com.example.Collections.sheets.and.sets.exception.EmployeeStorageIsFullException;
 import com.example.Collections.sheets.and.sets.model.Employee;
 import com.example.Collections.sheets.and.sets.service.EmployeeService;
@@ -25,14 +26,9 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Сотрудник не найден.");
     }
 
-    @ExceptionHandler(EmployeeStorageIsFullException.class)
-    public ResponseEntity<String> messageConflict() {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Превышен лимит количества сотрудников в фирме.");
-    }
-
-    @ExceptionHandler(EmployeeAlreadyAddedException.class)
-    public ResponseEntity<String> messageBadRequest() {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Уже есть такой сотрудник.");
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> messageIllegalArgument() {
+        return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body("Неверный ввод данных. Не указаны имя или фамилия.");
     }
 
     @GetMapping
@@ -41,17 +37,20 @@ public class EmployeeController {
     }
 
     @GetMapping("/add")
-    public Employee add(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+    public Employee add(@RequestParam("firstName") String firstName,
+                        @RequestParam("lastName") String lastName) {
         return employeeService.createEmployee(firstName, lastName);
     }
 
     @GetMapping("/remove")
-    public Employee remove(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+    public Employee remove(@RequestParam("firstName") String firstName,
+                           @RequestParam("lastName") String lastName) {
         return employeeService.removeEmployee(firstName, lastName);
     }
 
     @GetMapping("/find")
-    public Employee find(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName) {
+    public Employee find(@RequestParam("firstName") String firstName,
+                         @RequestParam("lastName") String lastName) {
         return employeeService.findEmployee(firstName, lastName);
     }
 }
